@@ -1,0 +1,50 @@
+interface CardProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+function Card({ children, className = "" }: CardProps) {
+  return (
+    <div className={`rounded-xl border bg-card text-card-foreground shadow-sm ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function CardHeader({ children, className = "" }: CardProps) {
+  return (
+    <div className={`flex flex-col space-y-1.5 p-6 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+function CardTitle({ children, className = "" }: CardProps) {
+  return (
+    <h3 className={`font-semibold leading-none tracking-tight ${className}`}>
+      {children}
+    </h3>
+  );
+}
+
+function CardDescription({ children, className = "" }: CardProps) {
+  return (
+    <p className={`text-sm text-muted-foreground ${className}`}>
+      {children}
+    </p>
+  );
+}
+
+function CardContent({ children, className = "" }: CardProps) {
+  return <div className={`p-6 pt-0 ${className}`}>{children}</div>;
+}
+
+function CardFooter({ children, className = "" }: CardProps) {
+  return (
+    <div className={`flex items-center p-6 pt-0 ${className}`}>
+      {children}
+    </div>
+  );
+}
+
+export { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter };
