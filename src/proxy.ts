@@ -1,19 +1,30 @@
-import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
-const publicPaths = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
+const publicPaths = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
 
 export function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
+  const isPublicAuthPage = publicPaths.some((p) => path.startsWith(p));
+  const isHome = path === '/';
+  const hasToken =
+    !!request.cookies.get('accessToken')?.value ||
+    !!request.cookies.get('refreshToken')?.value;
 
-  if (path === '/' || publicPaths.some((p) => path.startsWith(p))) {
+  if (isPublicAuthPage && hasToken) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
+  if (isHome || isPublicAuthPage) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get('accessToken')?.value;
-  const refreshToken = request.cookies.get('refreshToken')?.value;
-
-  if (!token && !refreshToken) {
+  if (!hasToken) {
     const loginUrl = new URL('/auth/login', request.url);
     loginUrl.searchParams.set('redirect', path);
     return NextResponse.redirect(loginUrl);
