@@ -1,5 +1,6 @@
 import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { API_BASE_URL } from './env';
+import { tokenStore } from './token';
 
 interface FailedRequest {
   resolve: (token: string) => void;
@@ -13,6 +14,17 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+api.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    const token = tokenStore.getAccessToken();
+    if (token && config.headers) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
 
 let isRefreshing = false;
 let failedQueue: FailedRequest[] = [];
@@ -57,16 +69,25 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+        const refreshToken = tokenStore.getRefreshToken();
+        const payload = refreshToken ? { refreshToken } : {};
         const { data } = await axios.post(
           `${API_BASE_URL}/auth/refresh`,
-          {},
+          payload,
           { withCredentials: true }
         );
-        const token = data?.data?.accessToken;
-        processQueue(null, token);
+        const { accessToken, refreshToken: newRefreshToken } = data?.data || {};
+        if (accessToken && newRefreshToken) {
+          tokenStore.setTokens(accessToken, newRefreshToken);
+        }
+        processQueue(null, accessToken);
+        if (accessToken) {
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+        }
         return api(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError, null);
+        tokenStore.clearTokens();
         if (typeof window !== 'undefined' && !isAuthPage()) {
           window.location.href = '/auth/login';
         }

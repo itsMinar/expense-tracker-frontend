@@ -2,6 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { authService } from '@/services/auth.service';
+import { tokenStore } from '@/lib/token';
 import { User } from '@/types';
 import { toast } from 'sonner';
 import { useRouter, usePathname } from 'next/navigation';
@@ -37,6 +38,9 @@ export function useAuth() {
     mutationFn: authService.login,
     onSuccess: (data) => {
       queryClient.setQueryData(['auth', 'me'], data.user);
+      if (data.accessToken && data.refreshToken) {
+        tokenStore.setTokens(data.accessToken, data.refreshToken);
+      }
       toast.success('Login successful');
       router.push('/dashboard');
     },
@@ -49,6 +53,9 @@ export function useAuth() {
     mutationFn: authService.register,
     onSuccess: (data) => {
       queryClient.setQueryData(['auth', 'me'], data.user);
+      if (data.accessToken && data.refreshToken) {
+        tokenStore.setTokens(data.accessToken, data.refreshToken);
+      }
       toast.success('Account created successfully');
       router.push('/dashboard');
     },
@@ -60,6 +67,7 @@ export function useAuth() {
   const logoutMutation = useMutation({
     mutationFn: authService.logout,
     onSuccess: () => {
+      tokenStore.clearTokens();
       queryClient.setQueryData(['auth', 'me'], null);
       queryClient.clear();
       toast.success('Logged out');
@@ -91,6 +99,7 @@ export function useAuth() {
   const deleteAccountMutation = useMutation({
     mutationFn: authService.deleteAccount,
     onSuccess: () => {
+      tokenStore.clearTokens();
       queryClient.setQueryData(['auth', 'me'], null);
       queryClient.clear();
       toast.success('Account deleted');
