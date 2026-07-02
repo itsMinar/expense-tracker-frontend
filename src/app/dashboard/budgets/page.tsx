@@ -10,7 +10,8 @@ import {
   Input,
   Select,
 } from '@/components/ui';
-import { formatCurrency } from '@/lib/utils';
+
+import { useCurrency } from '@/hooks/use-currency';
 import { budgetService } from '@/services/budget.service';
 import { categoryService } from '@/services/category.service';
 import { Budget } from '@/types';
@@ -21,6 +22,7 @@ import { toast } from 'sonner';
 
 export default function BudgetsPage() {
   const queryClient = useQueryClient();
+  const { formatCurrency: fc } = useCurrency();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
@@ -178,10 +180,10 @@ export default function BudgetsPage() {
               <div>
                 <div className="flex justify-between mb-1 text-sm">
                   <span className="text-muted-foreground">
-                    {formatCurrency(budget.spent)} spent
+                    {fc(budget.spent)} spent
                   </span>
                   <span className="text-muted-foreground">
-                    of {formatCurrency(budget.amount)}
+                    of {fc(budget.amount)}
                   </span>
                 </div>
                 <div className="h-2 rounded-full bg-muted overflow-hidden">
@@ -203,9 +205,7 @@ export default function BudgetsPage() {
                   {budget.isOverBudget && <AlertTriangle className="h-3 w-3" />}
                   {budget.percentage.toFixed(0)}% used
                 </span>
-                <span className="font-medium">
-                  {formatCurrency(budget.remaining)} left
-                </span>
+                <span className="font-medium">{fc(budget.remaining)} left</span>
               </div>
             </Card>
           ))}

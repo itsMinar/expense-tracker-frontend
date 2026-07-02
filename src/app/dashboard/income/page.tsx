@@ -11,7 +11,8 @@ import {
   Select,
   TableSkeleton,
 } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { useCurrency } from '@/hooks/use-currency';
+import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { incomeService } from '@/services/income.service';
 import { Income } from '@/types';
@@ -22,6 +23,7 @@ import { toast } from 'sonner';
 
 export default function IncomePage() {
   const queryClient = useQueryClient();
+  const { formatCurrency: fc } = useCurrency();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -176,7 +178,7 @@ export default function IncomePage() {
                     <td className="p-4 text-sm">{income.source || '-'}</td>
                     <td className="p-4 text-sm">{formatDate(income.date)}</td>
                     <td className="p-4 text-right font-medium text-emerald-600 dark:text-emerald-400">
-                      {formatCurrency(income.amount)}
+                      {fc(income.amount)}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-1">

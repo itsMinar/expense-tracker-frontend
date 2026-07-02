@@ -1,24 +1,24 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { ThemeToggle } from '@/components/common/theme-toggle';
+import { Avatar } from '@/components/ui';
+import { useAuth } from '@/hooks/use-auth';
 import {
-  LayoutDashboard,
-  Wallet,
-  TrendingUp,
-  Tags,
-  PiggyBank,
   BarChart3,
   FileText,
-  Settings,
+  LayoutDashboard,
   LogOut,
   Menu,
+  PiggyBank,
+  Settings,
+  Tags,
+  TrendingUp,
+  Wallet,
   X,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useState } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import { Avatar } from '@/components/ui';
-import { ThemeToggle } from '@/components/common/theme-toggle';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -58,7 +58,10 @@ export function Sidebar() {
         }`}
       >
         <div className="flex items-center justify-between p-6 border-b">
-          <Link href="/dashboard" className="flex items-center gap-2 font-bold text-lg">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 font-bold text-lg"
+          >
             <Wallet className="h-5 w-5 text-primary" />
             Trackr
           </Link>
@@ -72,7 +75,9 @@ export function Sidebar() {
 
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || (item.href !== '/dashboard' && pathname.startsWith(item.href));
+            const isActive =
+              pathname === item.href ||
+              (item.href !== '/dashboard' && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.href}
@@ -99,7 +104,9 @@ export function Sidebar() {
             <Avatar name={user?.name} size="sm" />
             <div className="flex-1 min-w-0">
               <p className="text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              <p className="text-xs text-muted-foreground truncate">
+                {user?.email}
+              </p>
             </div>
             <button
               onClick={() => logout()}

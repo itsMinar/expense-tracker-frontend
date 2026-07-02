@@ -1,15 +1,15 @@
 'use client';
 
+import { Card } from '@/components/ui';
+import { useCurrency } from '@/hooks/use-currency';
 import {
-  PieChart,
-  Pie,
   Cell,
+  Legend,
+  Pie,
+  PieChart,
   ResponsiveContainer,
   Tooltip,
-  Legend,
 } from 'recharts';
-import { Card } from '@/components/ui';
-import { formatCurrency } from '@/lib/utils';
 
 interface BreakdownItem {
   _id: string;
@@ -22,9 +22,16 @@ interface BreakdownChartProps {
   title: string;
 }
 
-const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
+const COLORS = [
+  'hsl(var(--chart-1))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+];
 
 export function BreakdownChart({ data, title }: BreakdownChartProps) {
+  const { formatCurrency: fc } = useCurrency();
   const chartData = data.map((item) => ({
     name: item.category?.name || 'Unknown',
     value: item.total,
@@ -52,7 +59,7 @@ export function BreakdownChart({ data, title }: BreakdownChartProps) {
               ))}
             </Pie>
             <Tooltip
-              formatter={(value: any) => formatCurrency(Number(value))}
+              formatter={(value: any) => fc(Number(value))}
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',

@@ -5,6 +5,7 @@ export interface User {
   avatar: string;
   role: 'user' | 'admin';
   emailVerified: boolean;
+  currency: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -81,8 +82,18 @@ export interface DashboardStats {
   budgetLeft: number;
   spendingRate: number;
   totalBudget: number;
-  expenseBreakdown: { _id: string; total: number; count: number; category: Category }[];
-  incomeBreakdown: { _id: string; total: number; count: number; category: Category }[];
+  expenseBreakdown: {
+    _id: string;
+    total: number;
+    count: number;
+    category: Category;
+  }[];
+  incomeBreakdown: {
+    _id: string;
+    total: number;
+    count: number;
+    category: Category;
+  }[];
   weeklySpending: { _id: number; total: number; count: number }[];
   monthlyExpenses: { month: number; total: number; count: number }[];
   monthlyIncomes: { month: number; total: number; count: number }[];

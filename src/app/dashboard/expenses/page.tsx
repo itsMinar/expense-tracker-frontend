@@ -11,7 +11,8 @@ import {
   Select,
   TableSkeleton,
 } from '@/components/ui';
-import { formatCurrency, formatDate } from '@/lib/utils';
+import { useCurrency } from '@/hooks/use-currency';
+import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { expenseService } from '@/services/expense.service';
 import { Expense } from '@/types';
@@ -22,6 +23,7 @@ import { toast } from 'sonner';
 
 export default function ExpensesPage() {
   const queryClient = useQueryClient();
+  const { formatCurrency: fc } = useCurrency();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
@@ -251,7 +253,7 @@ export default function ExpensesPage() {
                       </Badge>
                     </td>
                     <td className="p-4 text-right font-medium">
-                      {formatCurrency(expense.amount)}
+                      {fc(expense.amount)}
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-1">

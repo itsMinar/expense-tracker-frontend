@@ -1,17 +1,18 @@
 'use client';
 
+import { Card } from '@/components/ui';
+import { useCurrency } from '@/hooks/use-currency';
+import { getMonthName } from '@/lib/utils';
 import {
-  BarChart,
   Bar,
+  BarChart,
+  CartesianGrid,
+  Legend,
+  ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
 } from 'recharts';
-import { Card } from '@/components/ui';
-import { getMonthName, formatCurrency } from '@/lib/utils';
 
 interface MonthlyData {
   month: number;
@@ -24,6 +25,7 @@ interface OverviewChartProps {
 }
 
 export function OverviewChart({ expenses, incomes }: OverviewChartProps) {
+  const { formatCurrency: fc } = useCurrency();
   const data = expenses.map((e, i) => ({
     name: getMonthName(e.month),
     Expense: e.total,
@@ -43,7 +45,7 @@ export function OverviewChart({ expenses, incomes }: OverviewChartProps) {
               className="text-xs text-muted-foreground"
             />
             <Tooltip
-              formatter={(value: any) => formatCurrency(Number(value))}
+              formatter={(value: any) => fc(Number(value))}
               contentStyle={{
                 backgroundColor: 'hsl(var(--card))',
                 border: '1px solid hsl(var(--border))',
@@ -51,8 +53,16 @@ export function OverviewChart({ expenses, incomes }: OverviewChartProps) {
               }}
             />
             <Legend />
-            <Bar dataKey="Expense" fill="hsl(var(--chart-1))" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Income" fill="hsl(var(--chart-2))" radius={[4, 4, 0, 0]} />
+            <Bar
+              dataKey="Expense"
+              fill="hsl(var(--chart-1))"
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="Income"
+              fill="hsl(var(--chart-2))"
+              radius={[4, 4, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </div>

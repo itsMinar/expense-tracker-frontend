@@ -1,20 +1,24 @@
 'use client';
 
-import { Button, Card, ConfirmDialog, Input } from '@/components/ui';
+import { Button, Card, ConfirmDialog, Input, Select } from '@/components/ui';
 import { useAuth } from '@/hooks/use-auth';
+import { currencies } from '@/lib/currencies';
 import { authService } from '@/services/auth.service';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
-  const { user, updateProfile, changePassword, deleteAccount } = useAuth();
+  const { user, updateProfile, deleteAccount } = useAuth();
   const { theme, setTheme } = useTheme();
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
     email: user?.email || '',
   });
+  const [selectedCurrency, setSelectedCurrency] = useState(
+    user?.currency || 'USD'
+  );
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
     newPassword: '',
@@ -25,6 +29,11 @@ export default function SettingsPage() {
   const handleProfileUpdate = (e: React.FormEvent) => {
     e.preventDefault();
     updateProfile(profileData);
+  };
+
+  const handleCurrencyUpdate = () => {
+    if (selectedCurrency === user?.currency) return;
+    updateProfile({ currency: selectedCurrency });
   };
 
   const handlePasswordChange = async (e: React.FormEvent) => {
@@ -74,6 +83,33 @@ export default function SettingsPage() {
           />
           <Button type="submit">Update Profile</Button>
         </form>
+      </Card>
+
+      <Card className="p-6 space-y-6">
+        <h2 className="text-lg font-semibold">Currency</h2>
+        <p className="text-sm text-muted-foreground">
+          Choose your preferred currency for displaying amounts
+        </p>
+        <div className="flex items-end gap-3">
+          <div className="flex-1">
+            <Select
+              id="settings-currency"
+              label="Preferred Currency"
+              options={currencies.map((c) => ({
+                value: c.code,
+                label: `${c.symbol} ${c.code} - ${c.name}`,
+              }))}
+              value={selectedCurrency}
+              onChange={(e) => setSelectedCurrency(e.target.value)}
+            />
+          </div>
+          <Button
+            onClick={handleCurrencyUpdate}
+            disabled={selectedCurrency === user?.currency}
+          >
+            Update Currency
+          </Button>
+        </div>
       </Card>
 
       <Card className="p-6 space-y-6">
