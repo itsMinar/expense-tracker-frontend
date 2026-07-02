@@ -1,13 +1,19 @@
 'use client';
 
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { authService } from '@/services/auth.service';
+import { cacheKeys } from '@/lib/cache-keys';
 import { tokenStore } from '@/lib/token';
+import { authService } from '@/services/auth.service';
 import { User } from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useRouter, usePathname } from 'next/navigation';
 
-const PUBLIC_PATHS = ['/auth/login', '/auth/register', '/auth/forgot-password', '/auth/reset-password'];
+const PUBLIC_PATHS = [
+  '/auth/login',
+  '/auth/register',
+  '/auth/forgot-password',
+  '/auth/reset-password',
+];
 
 export function useAuth() {
   const queryClient = useQueryClient();
@@ -21,7 +27,7 @@ export function useAuth() {
     isLoading,
     isError,
   } = useQuery<User | null>({
-    queryKey: ['auth', 'me'],
+    queryKey: [cacheKeys.profile],
     queryFn: async () => {
       try {
         return await authService.getMe();
@@ -37,7 +43,7 @@ export function useAuth() {
   const loginMutation = useMutation({
     mutationFn: authService.login,
     onSuccess: (data) => {
-      queryClient.setQueryData(['auth', 'me'], data.user);
+      queryClient.setQueryData([cacheKeys.profile], data.user);
       if (data.accessToken && data.refreshToken) {
         tokenStore.setTokens(data.accessToken, data.refreshToken);
       }
@@ -52,7 +58,7 @@ export function useAuth() {
   const registerMutation = useMutation({
     mutationFn: authService.register,
     onSuccess: (data) => {
-      queryClient.setQueryData(['auth', 'me'], data.user);
+      queryClient.setQueryData([cacheKeys.profile], data.user);
       if (data.accessToken && data.refreshToken) {
         tokenStore.setTokens(data.accessToken, data.refreshToken);
       }
@@ -68,7 +74,7 @@ export function useAuth() {
     mutationFn: authService.logout,
     onSuccess: () => {
       tokenStore.clearTokens();
-      queryClient.setQueryData(['auth', 'me'], null);
+      queryClient.setQueryData([cacheKeys.profile], null);
       queryClient.clear();
       toast.success('Logged out');
       router.push('/auth/login');
@@ -78,7 +84,7 @@ export function useAuth() {
   const updateProfileMutation = useMutation({
     mutationFn: authService.updateProfile,
     onSuccess: (updatedUser) => {
-      queryClient.setQueryData(['auth', 'me'], updatedUser);
+      queryClient.setQueryData([cacheKeys.profile], updatedUser);
       toast.success('Profile updated');
     },
     onError: (error: any) => {
@@ -100,7 +106,7 @@ export function useAuth() {
     mutationFn: authService.deleteAccount,
     onSuccess: () => {
       tokenStore.clearTokens();
-      queryClient.setQueryData(['auth', 'me'], null);
+      queryClient.setQueryData([cacheKeys.profile], null);
       queryClient.clear();
       toast.success('Account deleted');
       router.push('/auth/login');

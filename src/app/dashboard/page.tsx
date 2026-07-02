@@ -10,16 +10,18 @@ import { BreakdownChart } from '@/components/dashboard/pie-chart';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { Card, CardSkeleton } from '@/components/ui';
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { dashboardService } from '@/services/dashboard.service';
 import { useQuery } from '@tanstack/react-query';
 import { AlertTriangle, PiggyBank } from 'lucide-react';
 
 export default function DashboardPage() {
+  const { formatCurrency: fc } = useCurrency();
+
   const { data, isLoading } = useQuery({
-    queryKey: ['dashboard', 'stats'],
+    queryKey: [cacheKeys.dashboard],
     queryFn: dashboardService.stats,
   });
-  const { formatCurrency: fc } = useCurrency();
 
   return (
     <AnimatedContent className="space-y-6">

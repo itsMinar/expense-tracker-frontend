@@ -13,6 +13,7 @@ import {
 import { categoryService } from '@/services/category.service';
 import { Category } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { cacheKeys } from '@/lib/cache-keys';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -45,7 +46,7 @@ export default function CategoriesPage() {
   });
 
   const { data: categories, isLoading } = useQuery({
-    queryKey: ['categories'],
+    queryKey: [cacheKeys.categories],
     queryFn: () => categoryService.list(),
   });
 
@@ -55,7 +56,7 @@ export default function CategoriesPage() {
         ? categoryService.update(editing._id, d)
         : categoryService.create(d),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.categories] });
       setShowForm(false);
       setEditing(null);
       setFormData({
@@ -72,7 +73,7 @@ export default function CategoriesPage() {
   const deleteMutation = useMutation({
     mutationFn: categoryService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['categories'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.categories] });
       toast.success('Category deleted');
     },
   });

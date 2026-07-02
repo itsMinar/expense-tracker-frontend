@@ -12,6 +12,7 @@ import {
   TableSkeleton,
 } from '@/components/ui';
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { incomeService } from '@/services/income.service';
@@ -40,12 +41,12 @@ export default function IncomePage() {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['income', { page, search, category }],
+    queryKey: [cacheKeys.income, { page, search, category }],
     queryFn: () => incomeService.list({ page, limit: 10, search, category }),
   });
 
   const { data: categories } = useQuery({
-    queryKey: ['categories', 'income'],
+    queryKey: [cacheKeys.categories, 'income'],
     queryFn: () => categoryService.list('income'),
   });
 
@@ -53,7 +54,7 @@ export default function IncomePage() {
     mutationFn: (d: any) =>
       editing ? incomeService.update(editing._id, d) : incomeService.create(d),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['income'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.income] });
       setShowForm(false);
       setEditing(null);
       setFormData({
@@ -73,7 +74,7 @@ export default function IncomePage() {
   const deleteMutation = useMutation({
     mutationFn: incomeService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['income'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.income] });
       toast.success('Income deleted');
     },
   });
@@ -110,7 +111,7 @@ export default function IncomePage() {
 
       <Card className="p-4">
         <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <Input
               id="search-income"
               placeholder="Search income..."

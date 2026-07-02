@@ -98,25 +98,33 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="p-4 border-t space-y-3">
-          <div className="flex items-center justify-between px-3">
-            <ThemeToggle />
-          </div>
-          <div className="flex items-center gap-3 px-3 py-2">
-            <Avatar name={user?.name} size="sm" />
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-xs text-muted-foreground truncate">
-                {user?.email}
-              </p>
+        <div className="border-t p-3">
+          <div className="rounded-xl bg-muted/50 px-3 py-2.5 space-y-2">
+            <div className="flex items-center gap-3">
+              <Avatar name={user?.name} size="sm" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user?.name}</p>
+                <p className="text-xs text-muted-foreground truncate">
+                  {user?.email}
+                </p>
+              </div>
             </div>
-            <button
-              onClick={() => logout()}
-              disabled={isLogoutLoading}
-              className="text-muted-foreground hover:text-foreground"
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
+            <div className="grid grid-cols-2 gap-2 pt-2 border-t border-border/50">
+              <div className="flex items-center justify-center rounded-lg bg-background/60 hover:bg-background transition-colors px-2 py-1.5">
+                <ThemeToggle />
+                <span className="text-xs text-muted-foreground ml-1.5">
+                  Theme
+                </span>
+              </div>
+              <button
+                onClick={() => logout()}
+                disabled={isLogoutLoading}
+                className="flex items-center justify-center gap-1.5 rounded-lg bg-background/60 hover:bg-red-500/10 hover:text-red-500 transition-colors px-2 py-1.5 text-xs text-muted-foreground"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Sign out
+              </button>
+            </div>
           </div>
         </div>
       </aside>

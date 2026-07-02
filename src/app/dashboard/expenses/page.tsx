@@ -12,6 +12,7 @@ import {
   TableSkeleton,
 } from '@/components/ui';
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { expenseService } from '@/services/expense.service';
@@ -43,7 +44,7 @@ export default function ExpensesPage() {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['expenses', { page, search, category, sort }],
+    queryKey: [cacheKeys.expenses, { page, search, category, sort }],
     queryFn: () =>
       expenseService.list({
         page,
@@ -55,7 +56,7 @@ export default function ExpensesPage() {
   });
 
   const { data: categories } = useQuery({
-    queryKey: ['categories', 'expense'],
+    queryKey: [cacheKeys.categories, 'expense'],
     queryFn: () => categoryService.list('expense'),
   });
 
@@ -65,7 +66,7 @@ export default function ExpensesPage() {
         ? expenseService.update(editing._id, d)
         : expenseService.create(d),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.expenses] });
       setShowForm(false);
       setEditing(null);
       setFormData({
@@ -87,7 +88,7 @@ export default function ExpensesPage() {
   const deleteMutation = useMutation({
     mutationFn: expenseService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['expenses'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.expenses] });
       toast.success('Expense deleted');
     },
   });
@@ -153,7 +154,7 @@ export default function ExpensesPage() {
 
       <Card className="p-4">
         <div className="flex flex-wrap gap-3">
-          <div className="flex-1 min-w-[200px]">
+          <div className="flex-1 min-w-50">
             <Input
               id="search"
               placeholder="Search expenses..."

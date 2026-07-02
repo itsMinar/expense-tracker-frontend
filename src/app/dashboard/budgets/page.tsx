@@ -16,6 +16,7 @@ import { budgetService } from '@/services/budget.service';
 import { categoryService } from '@/services/category.service';
 import { Budget } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { cacheKeys } from '@/lib/cache-keys';
 import { AlertTriangle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -37,12 +38,12 @@ export default function BudgetsPage() {
   });
 
   const { data: budgets, isLoading } = useQuery({
-    queryKey: ['budgets', { month, year }],
+    queryKey: [cacheKeys.budgets, { month, year }],
     queryFn: () => budgetService.list({ month, year }),
   });
 
   const { data: categories } = useQuery({
-    queryKey: ['categories', 'expense'],
+    queryKey: [cacheKeys.categories, 'expense'],
     queryFn: () => categoryService.list('expense'),
   });
 
@@ -50,7 +51,7 @@ export default function BudgetsPage() {
     mutationFn: (d: any) =>
       editing ? budgetService.update(editing._id, d) : budgetService.create(d),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.budgets] });
       setShowForm(false);
       setEditing(null);
       setFormData({
@@ -67,7 +68,7 @@ export default function BudgetsPage() {
   const deleteMutation = useMutation({
     mutationFn: budgetService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['budgets'] });
+      queryClient.invalidateQueries({ queryKey: [cacheKeys.budgets] });
       toast.success('Budget deleted');
     },
   });

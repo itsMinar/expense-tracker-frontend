@@ -2,6 +2,7 @@
 
 import { Card, CardSkeleton, Select } from '@/components/ui';
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { reportService } from '@/services/report.service';
 import { useQuery } from '@tanstack/react-query';
@@ -36,7 +37,7 @@ export default function AnalyticsPage() {
   const [year, setYear] = useState(now.getFullYear());
 
   const { data: report, isLoading } = useQuery({
-    queryKey: ['reports', { type, month, year }],
+    queryKey: [cacheKeys.reports, { type, month, year }],
     queryFn: () => reportService.generate({ type, month, year }),
   });
 
@@ -134,7 +135,7 @@ export default function AnalyticsPage() {
             <div className="grid gap-4 md:grid-cols-2">
               <Card className="p-6">
                 <h3 className="font-semibold mb-4">Expense by Category</h3>
-                <div className="h-[300px]">
+                <div className="h-75">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -159,7 +160,7 @@ export default function AnalyticsPage() {
 
               <Card className="p-6">
                 <h3 className="font-semibold mb-4">Income by Category</h3>
-                <div className="h-[300px]">
+                <div className="h-75">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
@@ -188,7 +189,7 @@ export default function AnalyticsPage() {
 
             <Card className="p-6">
               <h3 className="font-semibold mb-4">Income vs Expense</h3>
-              <div className="h-[300px]">
+              <div className="h-75">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart
                     data={[

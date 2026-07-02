@@ -2,6 +2,7 @@
 
 import { Button, Card, Select } from '@/components/ui';
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { reportService } from '@/services/report.service';
 import { useQuery } from '@tanstack/react-query';
@@ -17,7 +18,7 @@ export default function ReportsPage() {
   const [year, setYear] = useState(now.getFullYear());
 
   const { data: report, isLoading } = useQuery({
-    queryKey: ['reports', { type, month, year }],
+    queryKey: [cacheKeys.reports, { type, month, year }],
     queryFn: () => reportService.generate({ type, month, year }),
   });
 
