@@ -40,7 +40,9 @@ export function Sidebar() {
     <>
       <button
         onClick={() => setMobileOpen(true)}
-        className="fixed top-4 left-4 z-40 lg:hidden rounded-lg p-2 bg-background border shadow-sm"
+        className={`fixed top-4 right-4 z-40 rounded-lg p-2 bg-background border shadow-sm ${
+          mobileOpen ? 'hidden' : 'lg:hidden'
+        }`}
       >
         <Menu className="h-5 w-5" />
       </button>
