@@ -1,24 +1,39 @@
 'use client';
 
-import Link from 'next/link';
-import { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { toast } from 'sonner';
 import { Button, Input } from '@/components/ui';
 import { authService } from '@/services/auth.service';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
+import { z } from 'zod';
+
+const resetSchema = z.object({
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .min(6, 'Password must be at least 6 characters'),
+});
 
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get('token') || '';
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(resetSchema),
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: { password: string }) => {
     setLoading(true);
     try {
-      await authService.resetPassword({ token, password });
+      await authService.resetPassword({ token, password: data.password });
       setDone(true);
       toast.success('Password reset successful');
     } catch {
@@ -45,16 +60,17 @@ function ResetPasswordForm() {
         <h1 className="text-2xl font-bold">Reset your password</h1>
         <p className="text-sm text-muted-foreground">Enter your new password</p>
       </div>
-      <form onSubmit={handleSubmit} className="rounded-xl border bg-card p-6 shadow-sm space-y-4">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="rounded-xl border bg-card p-6 shadow-sm space-y-4"
+      >
         <Input
           id="password"
           label="New Password"
           type="password"
           placeholder="Enter new password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
+          error={errors.password?.message as string}
+          {...register('password')}
         />
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? 'Resetting...' : 'Reset password'}
