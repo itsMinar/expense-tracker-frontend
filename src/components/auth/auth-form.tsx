@@ -16,8 +16,8 @@ interface AuthFormField {
 
 interface AuthFormProps {
   fields: AuthFormField[];
-  schema: z.ZodObject<any>;
-  onSubmit: (data: any) => void;
+  schema: z.ZodSchema;
+  onSubmit: (data: unknown) => void;
   isLoading?: boolean;
   submitLabel: string;
 }
@@ -36,7 +36,9 @@ export function AuthForm({
     handleSubmit,
     formState: { errors },
   } = useForm({
-    resolver: zodResolver(schema),
+    resolver: zodResolver(
+      schema as unknown as Parameters<typeof zodResolver>[0]
+    ),
   });
 
   return (
@@ -63,7 +65,7 @@ export function AuthForm({
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-[34px] text-muted-foreground hover:text-foreground"
+                className="absolute right-3 top-8.5 text-muted-foreground hover:text-foreground"
               >
                 {showPassword ? (
                   <EyeOff className="h-4 w-4" />

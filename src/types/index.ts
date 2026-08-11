@@ -120,3 +120,105 @@ export interface ApiResponse<T> {
   message: string;
   success: boolean;
 }
+
+export interface SelectOption {
+  value: string;
+  label: string;
+}
+
+export type PaymentMethod =
+  'cash' | 'credit_card' | 'debit_card' | 'bank_transfer' | 'other';
+
+export type ReportType = 'weekly' | 'monthly' | 'yearly';
+
+export type CategoryType = 'expense' | 'income' | 'both';
+
+export interface ExpenseFormData {
+  title: string;
+  amount: string;
+  category: string;
+  description: string;
+  paymentMethod: PaymentMethod;
+  date: string;
+  notes: string;
+  tags: string;
+}
+
+export interface IncomeFormData {
+  title: string;
+  amount: string;
+  category: string;
+  source: string;
+  date: string;
+  notes: string;
+}
+
+export interface CategoryFormData {
+  name: string;
+  icon: string;
+  color: string;
+  type: CategoryType;
+}
+
+export interface BudgetFormData {
+  category: string;
+  amount: string;
+  month: number;
+  year: number;
+}
+
+export interface ProfileFormData {
+  name: string;
+  email: string;
+  currency?: string;
+}
+
+export interface PasswordChangeData {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export interface ForgotPasswordData {
+  email: string;
+}
+
+export interface ResetPasswordData {
+  token: string;
+  password: string;
+}
+
+export type Transaction = Expense | Income;
+
+export interface ExpenseCreateData {
+  title: string;
+  amount: number;
+  category: string;
+  description?: string;
+  paymentMethod: PaymentMethod;
+  date: string;
+  notes?: string;
+  tags: string[];
+}
+
+export interface IncomeCreateData {
+  title: string;
+  amount: number;
+  category: string;
+  source?: string;
+  date: string;
+  notes?: string;
+}
+
+export interface CategoryCreateData {
+  name: string;
+  icon: string;
+  color: string;
+  type: CategoryType;
+}
+
+export interface BudgetCreateData {
+  category: string;
+  amount: number;
+  month: number;
+  year: number;
+}

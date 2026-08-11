@@ -16,8 +16,14 @@ import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { expenseService } from '@/services/expense.service';
-import { Expense } from '@/types';
+import {
+  Expense,
+  ExpenseCreateData,
+  ExpenseFormData,
+  PaymentMethod,
+} from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -32,7 +38,7 @@ export default function ExpensesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Expense | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<ExpenseFormData>({
     title: '',
     amount: '',
     category: '',
@@ -60,8 +66,8 @@ export default function ExpensesPage() {
     queryFn: () => categoryService.list('expense'),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (d: any) =>
+  const createMutation = useMutation<Expense, AxiosError, ExpenseCreateData>({
+    mutationFn: (d: ExpenseCreateData) =>
       editing
         ? expenseService.update(editing._id, d)
         : expenseService.create(d),
@@ -81,8 +87,15 @@ export default function ExpensesPage() {
       });
       toast.success(editing ? 'Expense updated' : 'Expense added');
     },
-    onError: (err: any) =>
-      toast.error(err.response?.data?.message || 'Failed to save expense'),
+    onError: (err: AxiosError) => {
+      const msg =
+        err.response?.data &&
+        typeof err.response?.data === 'object' &&
+        'message' in err.response?.data
+          ? (err.response?.data as { message: string }).message
+          : 'Failed to save expense';
+      toast.error(msg);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -100,7 +113,7 @@ export default function ExpensesPage() {
       amount: expense.amount.toString(),
       category: expense.category?._id || '',
       description: expense.description || '',
-      paymentMethod: expense.paymentMethod,
+      paymentMethod: expense.paymentMethod as PaymentMethod,
       date: expense.date.split('T')[0],
       notes: expense.notes || '',
       tags: expense.tags?.join(', ') || '',
@@ -117,7 +130,10 @@ export default function ExpensesPage() {
     });
   };
 
-  const paymentMethodColors: Record<string, string> = {
+  const paymentMethodColors: Record<
+    PaymentMethod,
+    'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'
+  > = {
     cash: 'default',
     credit_card: 'warning',
     debit_card: 'secondary',
@@ -246,8 +262,9 @@ export default function ExpensesPage() {
                     <td className="p-4">
                       <Badge
                         variant={
-                          (paymentMethodColors[expense.paymentMethod] ||
-                            'outline') as any
+                          paymentMethodColors[
+                            expense.paymentMethod as PaymentMethod
+                          ]
                         }
                       >
                         {expense.paymentMethod.replace('_', ' ')}
@@ -373,7 +390,10 @@ export default function ExpensesPage() {
             ]}
             value={formData.paymentMethod}
             onChange={(e) =>
-              setFormData((p) => ({ ...p, paymentMethod: e.target.value }))
+              setFormData((p) => ({
+                ...p,
+                paymentMethod: e.target.value as PaymentMethod,
+              }))
             }
           />
           <Input

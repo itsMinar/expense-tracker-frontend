@@ -5,6 +5,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { reportService } from '@/services/report.service';
+import { ReportType } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { Download } from 'lucide-react';
 import { useState } from 'react';
@@ -13,11 +14,11 @@ import { toast } from 'sonner';
 export default function ReportsPage() {
   const now = new Date();
   const { formatCurrency: fc } = useCurrency();
-  const [type, setType] = useState('monthly');
+  const [type, setType] = useState<ReportType>('monthly');
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
 
-  const { data: report, isLoading } = useQuery({
+  const { data: report } = useQuery({
     queryKey: [cacheKeys.reports, { type, month, year }],
     queryFn: () => reportService.generate({ type, month, year }),
   });
@@ -68,7 +69,7 @@ export default function ReportsPage() {
               { value: 'yearly', label: 'Yearly' },
             ]}
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={(e) => setType(e.target.value as ReportType)}
           />
           {type !== 'yearly' && (
             <Select

@@ -4,6 +4,7 @@ import { Button, Card, ConfirmDialog, Input, Select } from '@/components/ui';
 import { useAuth } from '@/hooks/use-auth';
 import { currencies } from '@/lib/currencies';
 import { authService } from '@/services/auth.service';
+import { AxiosError } from 'axios';
 import { useTheme } from 'next-themes';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -43,8 +44,15 @@ export default function SettingsPage() {
       await authService.changePassword(passwordData);
       toast.success('Password changed successfully');
       setPasswordData({ currentPassword: '', newPassword: '' });
-    } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to change password');
+    } catch (err) {
+      const axiosError = err as AxiosError;
+      const msg =
+        axiosError.response?.data &&
+        typeof axiosError.response?.data === 'object' &&
+        'message' in axiosError.response?.data
+          ? (axiosError.response?.data as { message: string }).message
+          : 'Failed to change password';
+      toast.error(msg);
     } finally {
       setPasswordLoading(false);
     }

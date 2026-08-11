@@ -10,13 +10,14 @@ import {
   Input,
   Select,
 } from '@/components/ui';
+import { AxiosError } from 'axios';
 
 import { useCurrency } from '@/hooks/use-currency';
+import { cacheKeys } from '@/lib/cache-keys';
 import { budgetService } from '@/services/budget.service';
 import { categoryService } from '@/services/category.service';
-import { Budget } from '@/types';
+import { Budget, BudgetCreateData, BudgetFormData } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { cacheKeys } from '@/lib/cache-keys';
 import { AlertTriangle, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -25,12 +26,12 @@ export default function BudgetsPage() {
   const queryClient = useQueryClient();
   const { formatCurrency: fc } = useCurrency();
   const now = new Date();
-  const [month, setMonth] = useState(now.getMonth() + 1);
-  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState<number>(now.getMonth() + 1);
+  const [year, setYear] = useState<number>(now.getFullYear());
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Budget | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<BudgetFormData>({
     category: '',
     amount: '',
     month: now.getMonth() + 1,
@@ -47,8 +48,8 @@ export default function BudgetsPage() {
     queryFn: () => categoryService.list('expense'),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (d: any) =>
+  const createMutation = useMutation<Budget, AxiosError, BudgetCreateData>({
+    mutationFn: (d: BudgetCreateData) =>
       editing ? budgetService.update(editing._id, d) : budgetService.create(d),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [cacheKeys.budgets] });
@@ -62,7 +63,15 @@ export default function BudgetsPage() {
       });
       toast.success(editing ? 'Budget updated' : 'Budget created');
     },
-    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed'),
+    onError: (err: AxiosError) => {
+      const message =
+        err.response?.data &&
+        typeof err.response?.data === 'object' &&
+        'message' in err.response?.data
+          ? (err.response?.data as { message: string }).message
+          : 'Failed';
+      toast.error(message);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -109,7 +118,7 @@ export default function BudgetsPage() {
               }),
             }))}
             value={month.toString()}
-            onChange={(e) => setMonth(parseInt(e.target.value))}
+            onChange={(e) => setMonth(Number(e.target.value))}
           />
           <Select
             id="budget-year"
@@ -118,7 +127,7 @@ export default function BudgetsPage() {
               label: (now.getFullYear() - 2 + i).toString(),
             }))}
             value={year.toString()}
-            onChange={(e) => setYear(parseInt(e.target.value))}
+            onChange={(e) => setYear(Number(e.target.value))}
           />
         </div>
       </Card>
@@ -224,7 +233,7 @@ export default function BudgetsPage() {
             createMutation.mutate({
               ...formData,
               amount: parseFloat(formData.amount),
-            });
+            } as BudgetCreateData);
           }}
           className="space-y-4"
         >

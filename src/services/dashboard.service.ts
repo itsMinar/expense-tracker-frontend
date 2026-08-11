@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import { DashboardStats, ApiResponse } from '@/types';
+import { ApiResponse, DashboardStats } from '@/types';
 
 export const dashboardService = {
   stats: async () => {

@@ -16,8 +16,9 @@ import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { categoryService } from '@/services/category.service';
 import { incomeService } from '@/services/income.service';
-import { Income } from '@/types';
+import { Income, IncomeCreateData, IncomeFormData } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -31,7 +32,7 @@ export default function IncomePage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Income | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<IncomeFormData>({
     title: '',
     amount: '',
     category: '',
@@ -50,8 +51,8 @@ export default function IncomePage() {
     queryFn: () => categoryService.list('income'),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (d: any) =>
+  const createMutation = useMutation<Income, AxiosError, IncomeCreateData>({
+    mutationFn: (d: IncomeCreateData) =>
       editing ? incomeService.update(editing._id, d) : incomeService.create(d),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [cacheKeys.income] });
@@ -67,8 +68,15 @@ export default function IncomePage() {
       });
       toast.success(editing ? 'Income updated' : 'Income added');
     },
-    onError: (err: any) =>
-      toast.error(err.response?.data?.message || 'Failed to save income'),
+    onError: (err: AxiosError) => {
+      const msg =
+        err.response?.data &&
+        typeof err.response?.data === 'object' &&
+        'message' in err.response?.data
+          ? (err.response?.data as { message: string }).message
+          : 'Failed to save income';
+      toast.error(msg);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -81,7 +89,10 @@ export default function IncomePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createMutation.mutate({ ...formData, amount: parseFloat(formData.amount) });
+    createMutation.mutate({
+      ...formData,
+      amount: parseFloat(formData.amount),
+    } as IncomeCreateData);
   };
 
   return (

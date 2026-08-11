@@ -10,15 +10,21 @@ import {
   Select,
   TableSkeleton,
 } from '@/components/ui';
-import { categoryService } from '@/services/category.service';
-import { Category } from '@/types';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { cacheKeys } from '@/lib/cache-keys';
+import { categoryService } from '@/services/category.service';
+import {
+  Category,
+  CategoryCreateData,
+  CategoryType,
+  SelectOption,
+} from '@/types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-const iconOptions = [
+const iconOptions: SelectOption[] = [
   { value: 'folder', label: 'Folder' },
   { value: 'shopping-cart', label: 'Shopping' },
   { value: 'utensils', label: 'Food' },
@@ -38,7 +44,7 @@ export default function CategoriesPage() {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Category | null>(null);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<CategoryCreateData>({
     name: '',
     icon: 'folder',
     color: '#6b7280',
@@ -50,8 +56,8 @@ export default function CategoriesPage() {
     queryFn: () => categoryService.list(),
   });
 
-  const createMutation = useMutation({
-    mutationFn: (d: any) =>
+  const createMutation = useMutation<Category, AxiosError, CategoryCreateData>({
+    mutationFn: (d: CategoryCreateData) =>
       editing
         ? categoryService.update(editing._id, d)
         : categoryService.create(d),
@@ -67,7 +73,15 @@ export default function CategoriesPage() {
       });
       toast.success(editing ? 'Category updated' : 'Category created');
     },
-    onError: (err: any) => toast.error(err.response?.data?.message || 'Failed'),
+    onError: (err: AxiosError) => {
+      const msg =
+        err.response?.data &&
+        typeof err.response?.data === 'object' &&
+        'message' in err.response?.data
+          ? (err.response?.data as { message: string }).message
+          : 'Failed';
+      toast.error(msg);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -208,7 +222,10 @@ export default function CategoriesPage() {
             ]}
             value={formData.type}
             onChange={(e) =>
-              setFormData((p) => ({ ...p, type: e.target.value }))
+              setFormData((p) => ({
+                ...p,
+                type: e.target.value as CategoryType,
+              }))
             }
           />
           <Button

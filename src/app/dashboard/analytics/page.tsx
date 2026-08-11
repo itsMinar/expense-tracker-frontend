@@ -5,6 +5,7 @@ import { useCurrency } from '@/hooks/use-currency';
 import { cacheKeys } from '@/lib/cache-keys';
 import { formatDate } from '@/lib/utils';
 import { reportService } from '@/services/report.service';
+import { ReportType, Transaction } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import {
@@ -32,7 +33,7 @@ const COLORS = [
 export default function AnalyticsPage() {
   const now = new Date();
   const { formatCurrency: fc } = useCurrency();
-  const [type, setType] = useState('monthly');
+  const [type, setType] = useState<ReportType>('monthly');
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
 
@@ -73,7 +74,7 @@ export default function AnalyticsPage() {
               { value: 'yearly', label: 'Yearly' },
             ]}
             value={type}
-            onChange={(e) => setType(e.target.value)}
+            onChange={(e) => setType(e.target.value as ReportType)}
           />
           {type !== 'yearly' && (
             <Select
@@ -151,7 +152,11 @@ export default function AnalyticsPage() {
                           <Cell key={idx} fill={COLORS[idx % COLORS.length]} />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v: any) => fc(Number(v))} />
+                      <Tooltip
+                        formatter={(v: unknown) =>
+                          v !== undefined ? fc(Number(v)) : ''
+                        }
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -179,7 +184,11 @@ export default function AnalyticsPage() {
                           />
                         ))}
                       </Pie>
-                      <Tooltip formatter={(v: any) => fc(Number(v))} />
+                      <Tooltip
+                        formatter={(v: unknown) =>
+                          v !== undefined ? fc(Number(v)) : ''
+                        }
+                      />
                       <Legend />
                     </PieChart>
                   </ResponsiveContainer>
@@ -203,7 +212,11 @@ export default function AnalyticsPage() {
                     />
                     <XAxis dataKey="name" />
                     <YAxis tickFormatter={(v) => `${fc(Number(v))}`} />
-                    <Tooltip formatter={(v: any) => fc(Number(v))} />
+                    <Tooltip
+                      formatter={(v: unknown) =>
+                        v !== undefined ? fc(Number(v)) : ''
+                      }
+                    />
                     <Bar dataKey="amount" radius={[4, 4, 0, 0]}>
                       <Cell fill="hsl(var(--chart-2))" />
                       <Cell fill="hsl(var(--chart-1))" />
@@ -226,7 +239,7 @@ export default function AnalyticsPage() {
                     (a, b) =>
                       new Date(b.date).getTime() - new Date(a.date).getTime()
                   )
-                  .map((t: any) => (
+                  .map((t: Transaction) => (
                     <div
                       key={t._id}
                       className="flex items-center justify-between py-3"

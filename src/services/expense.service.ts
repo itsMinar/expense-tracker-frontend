@@ -1,5 +1,5 @@
 import api from '@/lib/api';
-import { Expense, Pagination, ApiResponse } from '@/types';
+import { ApiResponse, Expense, ExpenseCreateData, Pagination } from '@/types';
 
 interface ExpenseListResponse {
   expenses: Expense[];
@@ -8,22 +8,32 @@ interface ExpenseListResponse {
 
 export const expenseService = {
   list: async (params?: Record<string, string | number | undefined>) => {
-    const res = await api.get<ApiResponse<ExpenseListResponse>>('/expenses', { params });
+    const res = await api.get<ApiResponse<ExpenseListResponse>>('/expenses', {
+      params,
+    });
     return res.data.data;
   },
 
   getById: async (id: string) => {
-    const res = await api.get<ApiResponse<{ expense: Expense }>>(`/expenses/${id}`);
+    const res = await api.get<ApiResponse<{ expense: Expense }>>(
+      `/expenses/${id}`
+    );
     return res.data.data.expense;
   },
 
-  create: async (data: Partial<Expense>) => {
-    const res = await api.post<ApiResponse<{ expense: Expense }>>('/expenses', data);
+  create: async (data: ExpenseCreateData) => {
+    const res = await api.post<ApiResponse<{ expense: Expense }>>(
+      '/expenses',
+      data
+    );
     return res.data.data.expense;
   },
 
-  update: async (id: string, data: Partial<Expense>) => {
-    const res = await api.patch<ApiResponse<{ expense: Expense }>>(`/expenses/${id}`, data);
+  update: async (id: string, data: Partial<ExpenseCreateData>) => {
+    const res = await api.patch<ApiResponse<{ expense: Expense }>>(
+      `/expenses/${id}`,
+      data
+    );
     return res.data.data.expense;
   },
 

@@ -1,25 +1,36 @@
 import api from '@/lib/api';
-import { Category, ApiResponse } from '@/types';
+import { ApiResponse, Category, CategoryCreateData } from '@/types';
 
 export const categoryService = {
   list: async (type?: string) => {
     const params = type ? { type } : undefined;
-    const res = await api.get<ApiResponse<{ categories: Category[] }>>('/categories', { params });
+    const res = await api.get<ApiResponse<{ categories: Category[] }>>(
+      '/categories',
+      { params }
+    );
     return res.data.data.categories;
   },
 
   getById: async (id: string) => {
-    const res = await api.get<ApiResponse<{ category: Category }>>(`/categories/${id}`);
+    const res = await api.get<ApiResponse<{ category: Category }>>(
+      `/categories/${id}`
+    );
     return res.data.data.category;
   },
 
-  create: async (data: Partial<Category>) => {
-    const res = await api.post<ApiResponse<{ category: Category }>>('/categories', data);
+  create: async (data: CategoryCreateData) => {
+    const res = await api.post<ApiResponse<{ category: Category }>>(
+      '/categories',
+      data
+    );
     return res.data.data.category;
   },
 
-  update: async (id: string, data: Partial<Category>) => {
-    const res = await api.patch<ApiResponse<{ category: Category }>>(`/categories/${id}`, data);
+  update: async (id: string, data: Partial<CategoryCreateData>) => {
+    const res = await api.patch<ApiResponse<{ category: Category }>>(
+      `/categories/${id}`,
+      data
+    );
     return res.data.data.category;
   },
 

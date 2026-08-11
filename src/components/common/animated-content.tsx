@@ -7,13 +7,30 @@ const variants = {
   visible: { opacity: 1, y: 0 },
 };
 
-export function AnimatedContent({
-  children,
-  className,
-}: {
+interface AnimatedContentProps {
   children: React.ReactNode;
   className?: string;
-}) {
+}
+
+interface StaggerContainerProps {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}
+
+interface StaggerItemProps {
+  children: React.ReactNode;
+  className?: string;
+}
+
+interface AnimatedCounterProps {
+  value: number;
+  prefix?: string;
+  suffix?: string;
+  className?: string;
+}
+
+export function AnimatedContent({ children, className }: AnimatedContentProps) {
   return (
     <motion.div
       initial="hidden"
@@ -31,11 +48,7 @@ export function StaggerContainer({
   children,
   className,
   delay = 0.05,
-}: {
-  children: React.ReactNode;
-  className?: string;
-  delay?: number;
-}) {
+}: StaggerContainerProps) {
   return (
     <motion.div
       initial="hidden"
@@ -51,13 +64,7 @@ export function StaggerContainer({
   );
 }
 
-export function StaggerItem({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+export function StaggerItem({ children, className }: StaggerItemProps) {
   return (
     <motion.div
       variants={{
@@ -77,12 +84,7 @@ export function AnimatedCounter({
   prefix = '',
   suffix = '',
   className,
-}: {
-  value: number;
-  prefix?: string;
-  suffix?: string;
-  className?: string;
-}) {
+}: AnimatedCounterProps) {
   return (
     <motion.span
       initial={{ opacity: 0 }}

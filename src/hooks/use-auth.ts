@@ -5,6 +5,7 @@ import { tokenStore } from '@/lib/token';
 import { authService } from '@/services/auth.service';
 import { User } from '@/types';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { AxiosError } from 'axios';
 import { usePathname, useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
@@ -50,8 +51,14 @@ export function useAuth() {
       toast.success('Login successful');
       router.push('/dashboard');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Login failed');
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.data &&
+        typeof error.response?.data === 'object' &&
+        'message' in error.response?.data
+          ? (error.response?.data as { message: string }).message
+          : 'Login failed';
+      toast.error(msg);
     },
   });
 
@@ -65,8 +72,14 @@ export function useAuth() {
       toast.success('Account created successfully');
       router.push('/dashboard');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Registration failed');
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.data &&
+        typeof error.response?.data === 'object' &&
+        'message' in error.response?.data
+          ? (error.response?.data as { message: string }).message
+          : 'Registration failed';
+      toast.error(msg);
     },
   });
 
@@ -87,8 +100,14 @@ export function useAuth() {
       queryClient.setQueryData([cacheKeys.profile], updatedUser);
       toast.success('Profile updated');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Update failed');
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.data &&
+        typeof error.response?.data === 'object' &&
+        'message' in error.response?.data
+          ? (error.response?.data as { message: string }).message
+          : 'Update failed';
+      toast.error(msg);
     },
   });
 
@@ -97,8 +116,14 @@ export function useAuth() {
     onSuccess: () => {
       toast.success('Password changed successfully');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Password change failed');
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.data &&
+        typeof error.response?.data === 'object' &&
+        'message' in error.response?.data
+          ? (error.response?.data as { message: string }).message
+          : 'Password change failed';
+      toast.error(msg);
     },
   });
 
@@ -111,8 +136,14 @@ export function useAuth() {
       toast.success('Account deleted');
       router.push('/auth/login');
     },
-    onError: (error: any) => {
-      toast.error(error.response?.data?.message || 'Delete failed');
+    onError: (error: AxiosError) => {
+      const msg =
+        error.response?.data &&
+        typeof error.response?.data === 'object' &&
+        'message' in error.response?.data
+          ? (error.response?.data as { message: string }).message
+          : 'Delete failed';
+      toast.error(msg);
     },
   });
 
